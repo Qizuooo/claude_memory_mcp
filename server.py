@@ -554,5 +554,18 @@ def search_all(keyword: str) -> str:
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    app = mcp.streamable_http_app(allowed_hosts=["*"])
-    uvicorn.run(app, host="0.0.0.0", port=port, proxy_headers=True, forwarded_allow_ips="*")
+    inner = mcp.streamable_http_app()
+
+    class HostFix:
+        def __init__(self, app):
+            self.app = app
+        async def __call__(self, scope, receive, send):
+            if scope["type"] in ("http", "websocket"):
+                headers = dict(scope.get("headers", []))
+                headers[b"host"] = b"localhost"
+                scope["headers"] = list(headers.items())
+            await self.app(scope, receive, send)
+
+    uvicorn.run(HostFix(inner), host="0.0.0.0", port=port,
+                proxy_headers=True, forwarded_allow_ips="*")
+

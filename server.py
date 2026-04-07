@@ -389,7 +389,7 @@ def save_memory(name: str, category: str = "事实", importance: str = "中", da
 
         properties = {
             "名称": {"title": [{"text": {"content": name}}]},
-            "分类": {"select": {"name": category}},
+            "分类": {"multi_select": [{"name": category}]},
             "重要程度": {"select": {"name": importance}},
             "日期": {"date": {"start": date}}
         }
@@ -440,7 +440,8 @@ def get_all_memories(category: str = None) -> str:
     try:
         query = {"database_id": DB_MEMORY}
         if category:
-            query["filter"] = {"property": "分类", "select": {"equals": category}}
+            query["filter"] = {"property": "分类", "multi_select": {"contains": category}}
+
 
         results = notion.databases.query(**query).get("results", [])
         if not results:

@@ -554,10 +554,5 @@ def search_all(keyword: str) -> str:
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(
-        mcp.streamable_http_app(),
-        host="0.0.0.0",
-        port=port,
-        proxy_headers=True,
-        forwarded_allow_ips="*"
-    )
+    app = mcp.streamable_http_app(allowed_hosts=["*"])
+    uvicorn.run(app, host="0.0.0.0", port=port, proxy_headers=True, forwarded_allow_ips="*")

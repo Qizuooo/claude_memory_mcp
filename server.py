@@ -552,6 +552,6 @@ def search_all(keyword: str) -> str:
 # 启动服务器
 # ============================================================
 if __name__ == "__main__":
+    import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    mcp.run(transport="sse", host="0.0.0.0", port=port)
-
+    uvicorn.run(mcp.sse_app(), host="0.0.0.0", port=port)

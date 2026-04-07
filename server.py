@@ -14,7 +14,8 @@ DB_MOMENT = os.environ.get("NOTION_DB_MOMENT")       # 此刻
 DB_PROTOCOL = os.environ.get("NOTION_DB_PROTOCOL")   # 协议
 DB_MEMORY = os.environ.get("NOTION_DB_MEMORY")       # Memory
 
-mcp = FastMCP("Claude Notion Assistant")
+mcp = FastMCP("Claude Notion Assistant", host="0.0.0.0")
+
 
 
 # ============================================================
@@ -554,11 +555,4 @@ def search_all(keyword: str) -> str:
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    app = mcp.streamable_http_app()
-    app.user_middleware = [
-        m for m in app.user_middleware
-        if "TrustedHost" not in str(getattr(m, "cls", ""))
-    ]
-    app.middleware_stack = app.build_middleware_stack()
-    uvicorn.run(app, host="0.0.0.0", port=port,
-                proxy_headers=True, forwarded_allow_ips="*")
+    uvicorn.run(mcp.streamable_http_app(), host="0.0.0.0", port=port)
